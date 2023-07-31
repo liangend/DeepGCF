@@ -6,15 +6,15 @@ DeepGCF scores for human (GRCh38) and pig (susScr11) are available [here](https:
 
 ## Training DeepGCF model
 ### 1. Training DeepSEA
-The first step of training DeepGCF is to convert binary functional features to continuous values through a deep convolutional network [DeepSEA](https://www.nature.com/articles/nmeth.3547), which is implemented in a Python-based package [Selene](https://github.com/FunctionLab/selene). The required python packages for training DeepSEA include `selene-sdk`, `torch`, and `numpy`.
+The first step of training DeepGCF is to convert binary functional features to continuous values through a deep convolutional network [DeepSEA](https://www.nature.com/articles/nmeth.3547), which is implemented in a Python-based package [Selene](https://github.com/FunctionLab/selene). To run Selene,  Python 3.6 or above is recommended, and python packages `selene-sdk`, `torch`, and `numpy` are required.
 
 DeepSEA predicts the binary functional features using genome sequences as the input. Briefly, DeepSEA requires 4 inputs: 
 
 1) Reference genome (.fasta); 
 
-2) Functional features (.bed.gz) with 4 columns: chromosome, start bp, end bp, name of the feature. Detailed instructions of preparing functional feature file can be found [here](https://github.com/FunctionLab/selene/blob/master/tutorials/getting_started_with_selene/getting_started_with_selene.ipynb); 
+2) Functional features (.bed.gz) with 4 columns: chromosome, start bp, end bp, name of the feature. Detailed instructions of preparing a functional feature file can be found [here](https://github.com/FunctionLab/selene/blob/master/tutorials/getting_started_with_selene/getting_started_with_selene.ipynb); 
 
-3) Distinct feature (.txt) with one column of distinct feature names matching the feature name in the functional feature file; 
+3) Distinct feature (.txt) with one column of distinct feature names matching the feature names in the functional feature file; 
 
 4) Training intervals (.txt). The interval samples for training. Intervals should contain at least 1 functional feature specified in the functional feature file.
 
