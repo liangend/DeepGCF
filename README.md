@@ -31,3 +31,56 @@ configs = load_path("./simple_train.yml")
 parse_configs_and_run(configs, lr=0.01)
 ```
 `lr` specifies the learning rate to be 0.01. In the output directory, you can find the model trained by DeepSEA (.tar) and model performance evaluated on the test set. Detailed tutorial of DeepSEA can be found [here](https://github.com/FunctionLab/selene). 
+
+### 2. Data preparation
+
+There are several files required before DeepGCF training.
+
+#### Genome alignment
+
+This step generates the alignment of 50-bp window between human and pig. The code is based on [LECIF](https://github.com/ernstlab/LECIF) with small modifications.
+
+1.  Download [human-pig genome alignment (axtNet file)](https://hgdownload.soe.ucsc.edu/goldenPath/hg38/vsSusScr11/) with human as the reference. Alignment between other species can also be found on [UCSC genome browser](https://hgdownload.soe.ucsc.edu/downloads.html) or be made by [lastz](https://github.com/lastz/lastz).
+
+2.  Find all pig sequences that align to human chromosome. This step requires axtNet file and [pig chromosome sizes](https://hgdownload.soe.ucsc.edu/goldenPath/susScr11/bigZips/susScr11.chrom.sizes) as inputs.
+
+```         
+python src/findAligningBases.py [-h] -a AXTNET_FILE -m CHROM_SIZE_FILE -o OUTPUT_FILENAME
+
+optional arguments:
+   -h, --help            show this help message and exit
+
+required arguments:
+   -a, --axtnet-filename: path to axtNet file name
+   -m, --mouse-chrom-size-filename: path to chromosome size file name
+   -o, --output-filename: path to output file name
+
+# Example: python src/findAligningBases.py -a ~/hg38.susScr11.net.axt.gz -m ~/mm10.chrom.sizes -o aligning_bases/hg38.susScr11.alignbase.gz
+```
+
+3.  Aggregate all aligning pairs and assign a unique index to each.
+
+```         
+src/aggregateAligningBases \
+   <directory of the output file from findAligningBases> \
+   <path to output file name> 
+ 
+# Example:
+src/aggregateAligningBases aligning_bases/ position/hg38.susScr11.basepair.gz
+```
+
+4.  Sample the first base of every non-overlapping genomic window of length 50 bp (at most) defined across consecutive bases in each human chromosome that align to pig.
+
+```         
+python src/samplePairs.py [-h] [-b] -i INPUT_FILENAME -o OUTPUT_PREFIX
+ 
+optional arguments:
+   -h, --help: show this help message and exit
+   -b, --bin-size: size (bp) of the non-overlapping genomic window (default: 50)
+ 
+required arguments:
+   -i, --input-filename: path to output filename from aggregateAligningBases containing aligning pairs of human and pig bases
+   -o, --output-prefix: prefix for output files
+ 
+# Example: python src/samplePairs.py -i position/hg19.susScr11.basepair.gz -o position/hg38.susScr11.50bp
+```
