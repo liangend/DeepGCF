@@ -1,36 +1,44 @@
 # DeepGCF
+
 DeepGCF learns the functional conservation between pig and human based on the epigenome profiles from two species. It can be applied to pairwise comparisons of any two species given their epigenome profiles sequence alignments.
 
 ## Human-pig DeepGCF score
+
 DeepGCF scores for human (GRCh38) and pig (susScr11) are available [here](https://farm.cse.ucdavis.edu/~liangend/DeepGCF/). In the human bed file, each window has a unique score, but in the pig bed file, there are overlapping windows (the same region may have multiple scores) because the input sequence alignment is generated using human genome as the basis, which could align to multiple segments of pig genome.
 
 ## Training DeepGCF model
+
 ### 1. Training DeepSEA
-The first step of training DeepGCF is to convert binary functional features to continuous values through a deep convolutional network [DeepSEA](https://www.nature.com/articles/nmeth.3547), which is implemented in a Python-based package [Selene](https://github.com/FunctionLab/selene). To run Selene,  Python 3.6 or above is recommended, and python packages `selene-sdk`, `torch`, and `numpy` are required.
 
-DeepSEA predicts the binary functional features using genome sequences as the input. Briefly, DeepSEA requires 4 inputs: 
+The first step of training DeepGCF is to convert binary functional features to continuous values through a deep convolutional network [DeepSEA](https://www.nature.com/articles/nmeth.3547), which is implemented in a Python-based package [Selene](https://github.com/FunctionLab/selene). To run Selene, Python 3.6 or above is recommended, and python packages `selene-sdk`, `torch`, and `numpy` are required.
 
-1) Reference genome (.fasta); 
+DeepSEA predicts the binary functional features using genome sequences as the input. Briefly, DeepSEA requires 4 inputs:
 
-2) Functional features (.bed.gz) with 4 columns: chromosome, start bp, end bp, name of the feature. Detailed instructions of preparing a functional feature file can be found [here](https://github.com/FunctionLab/selene/blob/master/tutorials/getting_started_with_selene/getting_started_with_selene.ipynb); 
+1)  Reference genome (.fasta);
 
-3) Distinct feature (.txt) with one column of distinct feature names matching the feature names in the functional feature file; 
+2)  Functional features (.bed.gz) with 4 columns: chromosome, start bp, end bp, name of the feature. Detailed instructions of preparing a functional feature file can be found [here](https://github.com/FunctionLab/selene/blob/master/tutorials/getting_started_with_selene/getting_started_with_selene.ipynb);
 
-4) Training intervals (.txt). The interval samples for training. Intervals should contain at least 1 functional feature specified in the functional feature file.
+3)  Distinct feature (.txt) with one column of distinct feature names matching the feature names in the functional feature file;
+
+4)  Training intervals (.txt). The interval samples for training. Intervals should contain at least 1 functional feature specified in the functional feature file.
 
 Here is an example of training DeepSEA for one single functional feature. First download and extract the hg19 reference genome:
-```
+
+```         
 wget https://www.encodeproject.org/files/male.hg19/@@download/male.hg19.fasta.gz
 gzip -d male.hg19.fasta.gz
 ```
+
 The other 3 required input files can be found in [DeepSEA_example](https://github.com/liangend/DeepGCF/tree/main/DeepSEA_example). You also need a Python script `deeperdeepsea.py`, which constructs the DeepSEA structure. Then by specifying the input files and other model parameters in a configuration file (`simple_train.yml`), we can run DeepSEA as follows in Python:
-```
+
+```         
 from selene_sdk.utils import load_path
 from selene_sdk.utils import parse_configs_and_run
 configs = load_path("./simple_train.yml")
 parse_configs_and_run(configs, lr=0.01)
 ```
-`lr` specifies the learning rate to be 0.01. In the output directory, you can find the model trained by DeepSEA (.tar) and model performance evaluated on the test set. Detailed tutorial of DeepSEA can be found [here](https://github.com/FunctionLab/selene). 
+
+`lr` specifies the learning rate to be 0.01. In the output directory, you can find the model trained by DeepSEA (.tar) and model performance evaluated on the test set. Detailed tutorial of DeepSEA can be found [here](https://github.com/FunctionLab/selene).
 
 ### 2. Data preparation
 
@@ -52,10 +60,10 @@ optional arguments:
 
 required arguments:
    -a, --axtnet-filename: path to axtNet file name
-   -m, --mouse-chrom-size-filename: path to chromosome size file name
+   -m, --pig-chrom-size-filename: path to chromosome size file name
    -o, --output-filename: path to output file name
 
-# Example: python src/findAligningBases.py -a ~/hg38.susScr11.net.axt.gz -m ~/mm10.chrom.sizes -o aligning_bases/hg38.susScr11.alignbase.gz
+# Example: python src/findAligningBases.py -a ~/hg38.susScr11.net.axt.gz -m ~/susScr11.chrom.sizes -o aligning_bases/hg38.susScr11.alignbase.gz
 ```
 
 3.  Aggregate all aligning pairs and assign a unique index to each.
@@ -84,11 +92,12 @@ required arguments:
  
 # Example: python src/samplePairs.py -i position/hg19.susScr11.basepair.gz -o position/hg38.susScr11.50bp
 ```
+
 ### 3. Feature predition using DeepSEA
 
 ### 4. Training DeepGCF
 
-Finally, we can train the DeepGCF model using the functional features predicted using DeepSEA as the inputs. To make predictions for human regions from even chromosomes or the X chromosome and the corresponding paired pig regions, we train a DeepGCF model using paired regions from odd human and pig chromosomes. Similarly, paired regions from even human and pig chromosomes are used to train the model for predictions on human regions from odd chromosomes and the corresponding paired pig regions. Example input files for training DeepGCF are provided [here](https://github.com/liangend/DeepGCF/tree/main/DeepGCF_example).
+Finally, we can train the DeepGCF model using the functional features predicted using DeepSEA as the inputs. To make predictions for human regions from even chromosomes or the X chromosome and the corresponding paired pig regions, we train a DeepGCF model using paired regions from odd human and pig chromosomes. Similarly, paired regions from even human and pig chromosomes are used to train the model for predictions on human regions from odd chromosomes and the corresponding paired pig regions. Example input files for training DeepGCF using odd chromosomes are provided [here](https://github.com/liangend/DeepGCF/tree/main/DeepGCF_example).
 
 1.  Hyper-parameter search. Train N neural networks, each with randomly selected combinations of hyper-parameters and trained on the same subset of the whole training set.
 ```         
@@ -143,7 +152,7 @@ python src/train_deepgcf.py [-h] [-o OUTPUT_FILENAME_PREFIX] [-k] [-v] [-t]
    -hrmin, --human-rnaseq-min: minimum expression level in human RNA-seq data
    -hrmax, --human-rnaseq-max: maximum expression level in human RNA-seq data
    -mrmin, --pig-rnaseq-min: minimum expression level in pig RNA-seq data
-   -mrmax, --pig-rnaseq-max: maximum expression level in mouse RNA-seq data
+   -mrmax, --pig-rnaseq-max: maximum expression level in pig RNA-seq data
  
  optional arguments specifying hyper-parameters (ignored if random search (-k) is specified):
    -b, --batch-size: batch size (default: 128)
@@ -176,7 +185,7 @@ python src/train_deepgcf.py [-h] [-o OUTPUT_FILENAME_PREFIX] [-k] [-v] [-t]
 
 -   Columns 7-9: batch size, learning rate (epsilon), dropout rate
 
--   Columns 10-12: number of hidden layers in the human-specific sub-network, mouse-specific sub-network, and final sub-network
+-   Columns 10-12: number of hidden layers in the human-specific sub-network, pig-specific sub-network, and final sub-network
 
 -   Columns 13,14: number of neurons in the first and second hidden layers in the human-specific sub-network
 
@@ -210,4 +219,45 @@ python src/train_deepgcf.py \
  			-nnh1 128 -nnh2 0 -nnm1 128 -nnm2 0 \
  			-s 1 -t -v > output/NN_odd.log
 ```
-In the output folder, there will be a trained model (`NN_odd_1_50_9999_9999_4999_4999_128_0.01_0.0_1_1_1_128_0_128_0_8_0.pt`).
+In the output folder, there will be a trained model (`NN_odd_1_50_9999_9999_4999_4999_128_0.01_0.0_1_1_1_128_0_128_0_8_0.pt`). Repeat the hyper-parameter search step and model training step to train a model using paired functional features from even and X chromosomes.
+
+### 5. Prediction using DeepGCF
+As described in DeepGCF training section, model training and prediction are done twice for even and odd chromosomes separately. An example to predict the functional conservation for even chromosomes is as follows:
+```
+python src/predict_deepgcf.py [-h] [-b BATCH_SIZE] -t
+                                 TRAINED_CLASSIFIER_FILENAME -H
+                                 HUMAN_FEATURE_FILENAME -M
+                                 PIG_FEATURE_FILENAME -d DATA_SIZE -o
+                                 OUTPUT_FILENAME [-hf NUM_HUMAN_FEATURES]
+                                 [-mf NUM_PIG_FEATURES]
+                                 [-hrmin HUMAN_RNASEQ_MIN]
+                                 [-hrmax HUMAN_RNASEQ_MAX]
+                                 [-mrmin PIG_RNASEQ_MIN]
+                                 [-mrmax PIG_RNASEQ_MAX]
+ 
+ Generate predictions given a trained neural network
+ 
+ optional arguments:
+   -h, --help: show this help message and exit
+   -b, --batch-size: batch size (default: 128)
+ 
+ required arguments specifying input and output:
+   -t, --trained-classifier-filename: path to a trained classifier (.pt)
+   -H, --human-feature-filename: path to human feature data file
+   -M, --pig-feature-filename: path to pig feature data file
+   -d, --data-size: number of samples
+   -o, --output-filename: path to output file
+   -hf, --num-human-features: number of human features in input
+   -mf, --num-pig-features: number of pig features in input
+   -hrmin, --human-rnaseq-min: minimum expression level in human RNA-seq data
+   -hrmax, --human-rnaseq-max: maximum expression level in human RNA-seq data
+   -mrmin, --pig-rnaseq-min: minimum expression level in pig RNA-seq data
+   -mrmax, --pig-rnaseq-max: maximum expression level in pig RNA-seq data
+ 
+# Example: python src/predict_deepgcf.py \
+  -t output/NN_odd_1_50_9999_9999_4999_4999_128_0.01_0.0_1_1_1_128_0_128_0_8_0.pt \
+  -H DeepGCF_example/even_all_example.h.tsv \
+  -M DeepGCF_example/even_all_example.m.tsv \
+  -hf 14 -mf 10 \
+  -d 100 -o output/even_all.gz
+```
