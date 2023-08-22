@@ -82,7 +82,7 @@ optional arguments:
 required arguments specifying input and output:
    -A, --human-region-filename: path to human region filename
    -B, --pig-region-filename: path to pig region filename
-   -N, --total-num-pairs: total number of pairs
+   -N, --total-num-pairs: total number of pairs (number of lines of input files)
    -o, --output-dir: output directory
  
  required arguments specifying the split:
