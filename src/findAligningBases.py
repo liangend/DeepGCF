@@ -22,16 +22,18 @@ def readChromSizes(fn):
     return d
 
 def main():
-    description = 'For a given human chromosome, find all pig bases that align to that human chromosome'
-    epilog = '# Example for human chromosome 21: python src/findAligningBases.py \
-    -a position/axtNet/chr21.hg19.mm10.net.axt.gz \
-    -m position/mm10.chrom.sizes \
-    -o position/aligning_bases_by_chrom/hg19.chr21.mm10.basepair.gz'
+    description = 'Find all pig sequences that align to human genome'
+    epilog = '# Example python src/findAligningBases.py \
+    -a ~/hg38.susScr11.net.axt.gz \
+    -hg ~/hg38.chrom.sizes \
+    -m ~/susScr11.chrom.sizes \
+    -o aligning_bases/hg38.susScr11.alignbase.gz'
     parser = argparse.ArgumentParser(prog='python src/findAligningBases.py', description=description, epilog=epilog)
     g1 = parser.add_argument_group('required arguments')
-    g1.add_argument('-a','--axtnet-filename', help='path to human-chromosome-specific axtNet filename', required=True, type=str)
-    g1.add_argument('-m','--pig-chrom-size-filename', help='path to mm10.chrom.sizes', required=True, type=str)
-    g1.add_argument('-o','--output-filename', help='path to human-chromosome-specific output filename', required=True, type=str)
+    g1.add_argument('-a','--axtnet-filename', help='path to axtNet file name', required=True, type=str)
+    g1.add_argument('-hg','--human-chrom-size-filename', help='path to human chromosome size file name', required=True, type=str)
+    g1.add_argument('-m','--pig-chrom-size-filename', help='path to pig chromosome size file name', required=True, type=str)
+    g1.add_argument('-o','--output-filename', help='path to output file name', required=True, type=str)
     args = parser.parse_args()
 
     # When using job arrays, human chromosome X equals human chromosome 23
@@ -39,6 +41,7 @@ def main():
         args.axtnet_filename = args.axtnet_filename.replace('23','X')
         args.output_filename = args.output_filename.replace('23','X')
     args.output_filename += '.gz' if not args.output_filename.endswith('.gz') else '' # make sure output is .gz
+    hg_chromosome_size = readChromSizes(args.human_chrom_size_filename)
     mm_chromosome_size = readChromSizes(args.pig_chrom_size_filename)
 
     with gzip.open(args.axtnet_filename) as fin, gzip.open(args.output_filename,'wb') as fout:
@@ -81,6 +84,11 @@ def main():
                 e = mm_chrom_size-mm_start
                 mm_start = s
                 mm_end = e
+            
+            if hg_start < 510 or hg_end > hg_chromosome_size[hg_chrom] - 510 or mm_start < 510 or mm_end > mm_chromosome_size[mm_chrom] - 510:
+                for i in range(4): # skip human and pig base near the beginning or the end of the chromosome to avoid error in DeepSEA prediction (requires 1000-bp window)
+                    line = fin.readline()
+                continue
 
             # Read actual sequence of A,C,T, and G in the following lines
             hg_seq = fin.readline().strip().decode('utf-8')
