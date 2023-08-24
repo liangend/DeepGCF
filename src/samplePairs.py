@@ -80,7 +80,7 @@ def main():
         fout.write(line)
 
     # Write separate files for human and pig regions
-    os.system("gzip -cd %s.gz | awk -v OFS='\t' '{print $1,$2,$3}' | gzip > %s.h.gz" % (args.output_prefix,args.output_prefix))
-    os.system("gzip -cd %s.gz | awk -v OFS='\t' '{print $5,$6,$7}' | gzip > %s.m.gz" % (args.output_prefix,args.output_prefix))
+    os.system("gzip -cd %s.gz | awk -v OFS='\t' '{print $1,$2,$3,$9}' | gzip > %s.h.gz" % (args.output_prefix,args.output_prefix))
+    os.system("gzip -cd %s.gz | awk -v OFS='\t' '{print $5,$6,$7,$9}' | gzip > %s.m.gz" % (args.output_prefix,args.output_prefix))
 
 main()
