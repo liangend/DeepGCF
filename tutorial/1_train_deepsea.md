@@ -1,6 +1,6 @@
 ### 1. Training DeepSEA
 
-The first step of training DeepGCF is to convert binary functional features to continuous values through a deep convolutional network [DeepSEA](https://www.nature.com/articles/nmeth.3547), which is implemented in a Python-based package [Selene](https://github.com/FunctionLab/selene). To run Selene, Python 3.6 or above is recommended, and python packages `selene-sdk`, `torch`, and `numpy` are required.
+The first step of training DeepGCF is to convert binary functional features to continuous values through a deep convolutional network [DeepSEA](https://www.nature.com/articles/nmeth.3547), which is implemented in a Python-based package [Selene](https://github.com/FunctionLab/selene).
 
 DeepSEA predicts the binary functional features using genome sequences as the input. Briefly, DeepSEA requires 4 inputs:
 
