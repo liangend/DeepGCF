@@ -46,7 +46,7 @@ train_model: !obj:selene_sdk.TrainModel {
     data_parallel: False
 }
 random_seed: 1447
-output_dir: ./training_outputs
+output_dir: ./deepsea_outputs
 create_subdirectory: False
 load_test_set: False
 ...
