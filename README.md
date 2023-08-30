@@ -7,7 +7,20 @@ DeepGCF learns the functional conservation between pig and human based on the ep
 DeepGCF scores for human (GRCh38) and pig (susScr11) are available [here](https://farm.cse.ucdavis.edu/~liangend/DeepGCF/). In the human bed file, each window has a unique score, but in the pig bed file, there are overlapping windows (the same region may have multiple scores) because the input sequence alignment is generated using human genome as the basis, which could align to multiple segments of pig genome.
 
 ## Training DeepGCF model
-To train DeepGCF, Python 3.6 or above is recommended, and python packages `sklearn`, `selene-sdk`, `torch`, and `numpy` are required. Scripts involving data preparation and training DeepGCF are modified from [LECIF](https://github.com/ernstlab/LECIF). 
+DeepGCF pipeline is mainly Python-based. Scripts involving data preparation and training DeepGCF are modified from [LECIF](https://github.com/ernstlab/LECIF). In order to download `DeepGCF`, you can clone this repository via the command
+```
+git clone https://github.com/liangend/DeepGCF.git
+```
+In order to install the Python dependencies, you will need the [Anaconda](https://www.anaconda.com/download) package manager. After installing Anaconda, run the following commands to create an environment with DeepGCF's dependencies:
+```
+cd DeepGCF
+conda env create --file deepgcf_env.yml
+```
+Once the above has completed, run the following command to activate the conda environment. 
+```
+source activate deepgcf
+```
+The whole pipeline should be run under this environment to avoid errors caused by different package versions.
 
 [1. Training DeepSEA](https://github.com/liangend/DeepGCF/tree/main/tutorial/1_train_deepsea.md)
 
