@@ -1,0 +1,11 @@
+name: deepgcf
+channels:
+- bioconda
+dependencies:
+- python=3.6.9
+- pip
+- pip:
+  - numpy==1.16
+  - torch==1.10.0  
+  - selene_sdk==0.4.4
+  - scikit-learn==0.24.2
