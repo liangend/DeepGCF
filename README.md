@@ -20,7 +20,7 @@ Once the above has completed, run the following command to activate the conda en
 ```
 source activate deepgcf
 ```
-The whole pipeline should be run under this environment to avoid errors caused by different package versions.
+The whole pipeline should be run under this environment to avoid errors caused by different package versions. See the following tutorials for detailed steps of DeepGCF.
 
 [1. Training DeepSEA](https://github.com/liangend/DeepGCF/tree/main/tutorial/1_train_deepsea.md)
 
