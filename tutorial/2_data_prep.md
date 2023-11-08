@@ -117,7 +117,7 @@ required arguments specifying input and output:
        	    --even-prediction-human-chrom chr2 chr4 chr6 chr8 chr10 chr12 chr14 chr16 chr18 chr20 chr22 chrX \
        	    --even-training-pig-chrom chr2 chr6 chr10 chr14 chr18 \
 	          --even-validation-pig-chrom chr4 chr8 chr12 chr16 \
-	          --even-test-mouse-chrom chr2 chr4 chr6 chr8 chr10 chr12 chr14 chr16 chr18
+	          --even-test-pig-chrom chr2 chr4 chr6 chr8 chr10 chr12 chr14 chr16 chr18
 ```
 There are 16 output files, including 12 files of training, validation, and testing sets of human and pig regions from odd and even chromosomes, 2 files (`odd_all.h.gz` and `odd_all.m.gz`) for the prediction of human regions from odd chromosomes and corresponding paired pig regions using the model trained from even chromosomes, and 2 files (`even_all.h.gz` and `even_all.m.gz`) for the prediction of human regions from odd chromosomes and corresponding paired pig regions using the model trained from even chromosomes.
 
