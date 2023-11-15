@@ -21,7 +21,7 @@ analysis = AnalyzeSequences(
     
 analysis.get_predictions_for_bed_file("data/odd_training.h", "pred_results/") # two arguments: decompressed region file from "Data preparation" step as the input; output directory
 ```
-The output files in the `Data preparation` step need to be decompressed before using as the input of this step. There are two output files from the prediction: 1) a `.tsv` file containing the probabilities of each distinct feature for each region; 2) a `.NA` file containing regions without predictions (should be empty). Repeat this step for each human and pig region file. Note that the prediction for large files is time-consuming, so users may consider break a large region file into small ones and use parallel computing.
+Note that the input (odd_training.h) has to be decompressed file. The output files in the `Data preparation` step need to be decompressed before using as the input of this step. There are two output files from the prediction: 1) a `.tsv` file containing the probabilities of each distinct feature for each region; 2) a `.NA` file containing regions without predictions (should be empty). Repeat this step for each human and pig region file. Note that the prediction for large files is time-consuming, so users may consider break a large region file into small ones and use parallel computing.
 
 
 
